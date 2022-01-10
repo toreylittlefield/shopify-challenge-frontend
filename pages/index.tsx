@@ -4,8 +4,31 @@ import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import { Page } from '@shopify/polaris';
 import { ImportMinor } from '@shopify/polaris-icons';
+import { InferGetStaticPropsType } from 'next';
+import { NasaImageObj } from '../types/nasa-api-data.ds';
+import { getImageDataAPI } from './api/getNasaData';
 
-const Home: NextPage = () => {
+type Props = {
+  data: [] | NasaImageObj[];
+};
+
+export const getStaticProps = async (context) => {
+  // ...
+  const { json = false, status, statusText } = await getImageDataAPI();
+  console.log({ json, status, statusText });
+
+  if (!json) {
+    return {
+      props: { statusText, status },
+    };
+  }
+
+  return {
+    props: { data: json as NasaImageObj[] }, // will be passed to the page component as props
+  };
+};
+
+const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data = [], status, statusText }) => {
   const breadcrumbs = [
     { content: 'Sample apps', url: '/sample-apps' },
     { content: 'Create React App', url: '/create-react-app' },
@@ -24,6 +47,27 @@ const Home: NextPage = () => {
           <h1 className={styles.title}>
             Welcome to <a href="https://nextjs.org">Next.js!</a>
           </h1>
+          <div>
+            {data.map((imgObj) => {
+              const { copyright, date, explanation, title, url, media_type } = imgObj;
+              return (
+                <section key={url}>
+                  <figure>
+                    {media_type === 'video' ? (
+                      <iframe width="420" height="315" src={url}></iframe>
+                    ) : (
+                      <Image src={url} alt={title} height={380} width={300}></Image>
+                    )}
+                    <figcaption>
+                      {title}::::{date}
+                    </figcaption>
+                    <p>{explanation}</p>
+                    <sub>{copyright}</sub>
+                  </figure>
+                </section>
+              );
+            })}
+          </div>
 
           <p className={styles.description}>
             Get started by editing <code className={styles.code}>pages/index.tsx</code>
