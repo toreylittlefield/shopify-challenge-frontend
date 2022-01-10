@@ -1,3 +1,21 @@
+# Frontend 2022 Shopify Challenge - Spacestagram
+
+## Live Site
+
+Deployed on Netlify
+
+https://torey-spacestagram-shopify.netlify.app
+
+---
+
+## For Admin (ME)
+
+Admin URL
+
+https://app.netlify.com/sites/torey-spacestagram-shopify
+
+---
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
