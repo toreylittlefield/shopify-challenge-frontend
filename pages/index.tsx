@@ -9,6 +9,7 @@ import { NasaApiObj, NasaImageObj } from '../types/nasa-api-data';
 import { getImageDataAPI } from './api/getNasaData';
 import { shimmer, toBase64, updateApiDataNewProps } from '../utils';
 import Video from '../components/Video';
+import Article from '../components/Article';
 
 type Props = {
   data: [] | NasaImageObj[];
@@ -51,47 +52,9 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
             Welcome to <a href="https://nextjs.org">Next.js!</a>
           </h1>
           <div>
-            {data.map(
-              (
-                {
-                  copyright,
-                  date,
-                  explanation,
-                  title,
-                  url = 'https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png',
-                  media_type,
-                  thumbnail_url,
-                  id,
-                },
-                index
-              ) => {
-                const blurDataURL = `data:image/svg+xml;base64,${toBase64(shimmer('336', '504'))}`;
-                return (
-                  <section key={id}>
-                    <figure>
-                      {media_type === 'video' ? (
-                        <Video key={url} {...{ data, title, url, index, thumbnail_url }} />
-                      ) : (
-                        <Image
-                          priority={index === 0 || index === 1}
-                          src={url}
-                          alt={title}
-                          height={336}
-                          width={504}
-                          placeholder="blur"
-                          blurDataURL={blurDataURL}
-                        />
-                      )}
-                      <figcaption>
-                        {title} :::: {date}
-                      </figcaption>
-                      <p>{explanation}</p>
-                      <sub>{copyright}</sub>
-                    </figure>
-                  </section>
-                );
-              }
-            )}
+            {data.map((imgObj, index) => {
+              return <Article key={imgObj.id} {...{ ...imgObj, index }} />;
+            })}
           </div>
 
           <p className={styles.description}>
