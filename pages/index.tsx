@@ -27,7 +27,8 @@ export const getStaticProps = async () => {
   const data = updateApiDataNewProps(json as NasaApiObj[]);
 
   return {
-    props: { data }, // will be passed to the page component as props
+    revalidate: 10,
+    props: { data },
   };
 };
 
