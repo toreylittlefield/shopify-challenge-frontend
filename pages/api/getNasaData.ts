@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 export async function getImageDataAPI() {
   try {
     const url: EndPoints = 'https://api.nasa.gov/planetary/apod';
-    const paramOptions: NasaSearchParams = { api_key: NASA_API_KEY, count: 100, thumbs: true };
+    const paramOptions: NasaSearchParams = { api_key: NASA_API_KEY, count: 5, thumbs: true };
     const searchParams = new URLSearchParams(paramOptions as any);
 
     var response: Response | undefined = await fetch(`${url}?${searchParams.toString()}`);
