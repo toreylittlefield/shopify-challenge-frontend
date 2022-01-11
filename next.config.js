@@ -2,6 +2,6 @@
 module.exports = {
   reactStrictMode: true,
   images: {
-    domains: ['apod.nasa.gov', 'www.youtube.com', 'www.ustream.tv'],
+    domains: ['apod.nasa.gov', 'i.vimeocdn.com', 'vimeocdn.com', 'img.youtube.com', 'youtube.com', 'www.ustream.tv'],
   },
 };
