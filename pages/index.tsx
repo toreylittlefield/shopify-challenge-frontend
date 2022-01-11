@@ -27,7 +27,6 @@ export const getStaticProps = async () => {
   const data = updateApiDataNewProps(json as NasaApiObj[]);
 
   return {
-    revalidate: 10,
     props: { data },
   };
 };
