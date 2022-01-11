@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { NASA_API_KEY } from './utils';
-import { EndPoints, NasaImageObj, NasaSearchParams } from '../../types/nasa-api-data.ds';
+import { EndPoints, NasaImageObj, NasaSearchParams } from '../../types/nasa-api-data';
 import { URLSearchParams } from 'url';
 
 type Data = {
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 export async function getImageDataAPI() {
   try {
     const url: EndPoints = 'https://api.nasa.gov/planetary/apod';
-    const paramOptions: NasaSearchParams = { api_key: NASA_API_KEY, count: 10, thumbs: true };
+    const paramOptions: NasaSearchParams = { api_key: NASA_API_KEY, count: 100, thumbs: true };
     const searchParams = new URLSearchParams(paramOptions as any);
 
     var response: Response | undefined = await fetch(`${url}?${searchParams.toString()}`);
