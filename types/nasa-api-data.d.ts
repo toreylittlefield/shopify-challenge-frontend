@@ -11,7 +11,7 @@ export interface NasaSearchParams {
   thumbs?: boolean;
 }
 
-export interface NasaImageObj {
+export interface NasaApiObj {
   copyright: string;
   date: Date;
   explanation: string;
@@ -22,3 +22,10 @@ export interface NasaImageObj {
   url: string;
   thumbnail_url: string;
 }
+
+interface UpdatedImgObj extends NasaApiObj {
+  id: string;
+  earth_date: Date;
+}
+
+export type NasaImageObj = Omit<UpdatedImgOb, 'date'>;
