@@ -1,7 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { NASA_API_KEY } from './utils';
-import { EndPoints, NasaImageObj } from '../../types/nasa-api-data.ds';
+import { EndPoints, NasaImageObj, NasaSearchParams } from '../../types/nasa-api-data.ds';
+import { URLSearchParams } from 'url';
 
 type Data = {
   message: string | NasaImageObj[];
@@ -23,15 +24,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 export async function getImageDataAPI() {
   try {
     const url: EndPoints = 'https://api.nasa.gov/planetary/apod';
-    const params = new URLSearchParams({ api_key: NASA_API_KEY, count: '10' });
-    var response = await fetch(`${url}?${params.toString()}`);
+    const paramOptions: NasaSearchParams = { api_key: NASA_API_KEY, count: 10, thumbs: true };
+    const searchParams = new URLSearchParams(paramOptions as any);
+
+    var response: Response | undefined = await fetch(`${url}?${searchParams.toString()}`);
     if (response.ok) {
       const json: NasaImageObj[] = await response.json();
       return { status: response.status, statusText: response.statusText, json: json };
     }
-    return { status: response.status, statusText: response.statusText };
+    throw new Error(String(response.status));
   } catch (error) {
     console.error(error);
-    return { status: response.status, statusText: response.statusText };
+    switch (response) {
+      case undefined: {
+        return { status: 502, statusText: 'Internal Server Error - Failed To Fetch' };
+      }
+      default: {
+        return { status: response.status, statusText: response.statusText };
+      }
+    }
   }
 }
