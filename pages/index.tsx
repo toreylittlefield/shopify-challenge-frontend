@@ -7,6 +7,7 @@ import { ImportMinor } from '@shopify/polaris-icons';
 import { InferGetStaticPropsType } from 'next';
 import { NasaImageObj } from '../types/nasa-api-data.ds';
 import { getImageDataAPI } from './api/getNasaData';
+import { shimmer, toBase64 } from '../utils';
 
 type Props = {
   data: [] | NasaImageObj[];
@@ -15,7 +16,6 @@ type Props = {
 export const getStaticProps = async (context) => {
   // ...
   const { json = false, status, statusText } = await getImageDataAPI();
-  console.log({ json, status, statusText });
 
   if (!json) {
     return {
@@ -48,18 +48,26 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
             Welcome to <a href="https://nextjs.org">Next.js!</a>
           </h1>
           <div>
-            {data.map((imgObj) => {
-              const { copyright, date, explanation, title, url, media_type } = imgObj;
+            {data.map((imgObj, idx) => {
+              const { copyright, date, explanation, title, url, media_type, thumbs } = imgObj;
               return (
                 <section key={url}>
                   <figure>
                     {media_type === 'video' ? (
-                      <iframe width="420" height="315" src={url}></iframe>
+                      <iframe width="504" height="336" src={url}></iframe>
                     ) : (
-                      <Image src={url} alt={title} height={380} width={300}></Image>
+                      <Image
+                        priority={idx === 0 || idx === 1}
+                        src={url}
+                        alt={title}
+                        height={446}
+                        width={504}
+                        placeholder="blur"
+                        blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer('336', '504'))}`}
+                      />
                     )}
                     <figcaption>
-                      {title}::::{date}
+                      {title} :::: {date}
                     </figcaption>
                     <p>{explanation}</p>
                     <sub>{copyright}</sub>
