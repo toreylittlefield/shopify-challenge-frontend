@@ -5,15 +5,16 @@ import styles from '../styles/Home.module.css';
 import { Page } from '@shopify/polaris';
 import { ImportMinor } from '@shopify/polaris-icons';
 import { InferGetStaticPropsType } from 'next';
-import { NasaImageObj } from '../types/nasa-api-data.ds';
+import { NasaApiObj, NasaImageObj } from '../types/nasa-api-data';
 import { getImageDataAPI } from './api/getNasaData';
-import { shimmer, toBase64 } from '../utils';
+import { shimmer, toBase64, updateApiDataNewProps } from '../utils';
+import Video from '../components/Video';
 
 type Props = {
   data: [] | NasaImageObj[];
 };
 
-export const getStaticProps = async (context) => {
+export const getStaticProps = async () => {
   // ...
   const { json = false, status, statusText } = await getImageDataAPI();
 
@@ -23,8 +24,10 @@ export const getStaticProps = async (context) => {
     };
   }
 
+  const data = updateApiDataNewProps(json as NasaApiObj[]);
+
   return {
-    props: { data: json as NasaImageObj[] }, // will be passed to the page component as props
+    props: { data }, // will be passed to the page component as props
   };
 };
 
@@ -48,33 +51,47 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
             Welcome to <a href="https://nextjs.org">Next.js!</a>
           </h1>
           <div>
-            {data.map((imgObj, idx) => {
-              const { copyright, date, explanation, title, url, media_type, thumbs } = imgObj;
-              return (
-                <section key={url}>
-                  <figure>
-                    {media_type === 'video' ? (
-                      <iframe width="504" height="336" src={url}></iframe>
-                    ) : (
-                      <Image
-                        priority={idx === 0 || idx === 1}
-                        src={url}
-                        alt={title}
-                        height={446}
-                        width={504}
-                        placeholder="blur"
-                        blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer('336', '504'))}`}
-                      />
-                    )}
-                    <figcaption>
-                      {title} :::: {date}
-                    </figcaption>
-                    <p>{explanation}</p>
-                    <sub>{copyright}</sub>
-                  </figure>
-                </section>
-              );
-            })}
+            {data.map(
+              (
+                {
+                  copyright,
+                  date,
+                  explanation,
+                  title,
+                  url = 'https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png',
+                  media_type,
+                  thumbnail_url,
+                  id,
+                },
+                index
+              ) => {
+                const blurDataURL = `data:image/svg+xml;base64,${toBase64(shimmer('336', '504'))}`;
+                return (
+                  <section key={id}>
+                    <figure>
+                      {media_type === 'video' ? (
+                        <Video key={url} {...{ data, title, url, index, thumbnail_url }} />
+                      ) : (
+                        <Image
+                          priority={index === 0 || index === 1}
+                          src={url}
+                          alt={title}
+                          height={336}
+                          width={504}
+                          placeholder="blur"
+                          blurDataURL={blurDataURL}
+                        />
+                      )}
+                      <figcaption>
+                        {title} :::: {date}
+                      </figcaption>
+                      <p>{explanation}</p>
+                      <sub>{copyright}</sub>
+                    </figure>
+                  </section>
+                );
+              }
+            )}
           </div>
 
           <p className={styles.description}>
