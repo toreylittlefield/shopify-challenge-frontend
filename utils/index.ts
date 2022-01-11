@@ -1,3 +1,6 @@
+import { nanoid } from 'nanoid';
+import { NasaApiObj, NasaImageObj } from '../types/nasa-api-data';
+
 export const shimmer = (w: string, h: string) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -14,3 +17,12 @@ export const shimmer = (w: string, h: string) => `
 
 export const toBase64 = (str: string) =>
   typeof window === 'undefined' ? Buffer.from(str).toString('base64') : window.btoa(str);
+
+export const updateApiDataNewProps = (nasaApiArray: NasaApiObj[] = []): NasaImageObj[] => {
+  const updatedData = nasaApiArray.map((imgObj) => {
+    const { date, ...rest } = imgObj;
+    return { ...rest, earth_date: date, id: nanoid() };
+  });
+
+  return updatedData;
+};
