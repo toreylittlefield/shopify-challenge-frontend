@@ -2,14 +2,15 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
-import { Page } from '@shopify/polaris';
+import { Page, Spinner } from '@shopify/polaris';
 import { ImportMinor } from '@shopify/polaris-icons';
 import { InferGetStaticPropsType } from 'next';
 import { NasaApiObj, NasaImageObj } from '../types/nasa-api-data';
 import { getImageDataAPI } from './api/getNasaData';
-import { shimmer, toBase64, updateApiDataNewProps } from '../utils';
-import Video from '../components/Video';
+import { updateApiDataNewProps } from '../utils';
 import Article from '../components/Article';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
+import { useCallback, useState } from 'react';
 
 type Props = {
   data: [] | NasaImageObj[];
@@ -39,6 +40,34 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
   ];
   const primaryAction = { content: 'New product' };
   const secondaryActions = [{ content: 'Import', icon: ImportMinor }];
+
+  const [articles, setArticles] = useState(data);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await fetch('/api/getNasaData');
+      if (res.ok) {
+        const json = await res.json();
+        console.log({ json });
+        return json.message;
+      }
+      throw new Error(res.statusText);
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }, []);
+
+  const getMoreImages = useCallback(async () => {
+    const nasaApiData = await fetchData();
+    if (nasaApiData.length > 0) {
+      const nasaImgData = updateApiDataNewProps(nasaApiData);
+      setArticles((prev) => [...prev, ...nasaImgData]);
+    }
+  }, [fetchData]);
+
+  const [sentinelRef, _, isLoading] = useInfiniteScroll(getMoreImages);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -52,14 +81,15 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
             Welcome to <a href="https://nextjs.org">Next.js!</a>
           </h1>
           <div className={styles.grid}>
-            {data.map((imgObj, index) => {
+            {articles.map((imgObj, index) => {
               return <Article key={imgObj.id} {...{ ...imgObj, index }} />;
             })}
           </div>
+          {isLoading && <Spinner size="large" />}
         </main>
       </Page>
 
-      <footer className={styles.footer}>
+      <footer ref={sentinelRef} className={styles.footer}>
         <a
           href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
           target="_blank"
