@@ -1,38 +1,46 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 
-const useInfiniteScroll = (callback: Function): [React.MutableRefObject<HTMLDivElement | null>, any[], boolean] => {
+/**
+ *
+ * @param callback this callback should be a fetch function
+ * @param loadingTime the time to wait in ms
+ * @returns returns useRef object and loading state
+ */
+const useInfiniteScroll = (
+  callback: Function,
+  loadingTime: number
+): [React.MutableRefObject<HTMLDivElement | null>, boolean] => {
   const elementRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // for the purposes of the app this will show a loading state as we fetch api data from the callback function we pass in
   const getDataFromCallback = useCallback(() => {
-    setLoading(true);
+    setIsLoading(true);
     setTimeout(async () => {
-      const data = await callback();
-      setData((prev) => [...prev, data]);
-      setLoading(false);
-    }, 600);
-  }, [callback]);
+      await callback();
+      setIsLoading(false);
+    }, loadingTime);
+  }, [callback, loadingTime]);
 
   const intersectionCallback: IntersectionObserverCallback = (entries) => {
-    if (entries.length === 1) {
-      const [entry] = entries;
+    entries.forEach((entry) => {
       if (entry.isIntersecting) {
         getDataFromCallback();
       }
-    }
+    });
   };
   if (typeof window !== 'undefined' && observerRef.current == null && elementRef.current instanceof Element) {
     observerRef.current = new IntersectionObserver(intersectionCallback);
     observerRef.current.observe(elementRef.current);
   }
 
+  // on mount this will trigger a rerender and elementRef.current will be set on the 2nd render allowing the observer to work
   useEffect(() => {
-    getDataFromCallback();
-  }, [getDataFromCallback]);
+    setIsLoading(false);
+  }, []);
 
-  return [elementRef, data, loading];
+  return [elementRef, isLoading];
 };
 
 export default useInfiniteScroll;
