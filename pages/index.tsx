@@ -66,7 +66,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
     }
   }, [fetchData]);
 
-  const [sentinelRef, _, isLoading] = useInfiniteScroll(getMoreImages);
+  const [sentinelRef, isLoading] = useInfiniteScroll(getMoreImages, 350);
 
   return (
     <div className={styles.container}>
