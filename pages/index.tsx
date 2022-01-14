@@ -11,6 +11,7 @@ import { updateApiDataNewProps } from '../utils';
 import Article from '../components/Article';
 import useInfiniteScroll from '../hooks/useInfiniteScroll';
 import { useCallback, useState } from 'react';
+import useFetch from '../hooks/useFetch';
 
 type Props = {
   data: [] | NasaImageObj[];
@@ -43,29 +44,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
 
   const [articles, setArticles] = useState(data);
 
-  const fetchData = useCallback(async () => {
-    try {
-      const res = await fetch('/api/getNasaData');
-      if (res.ok) {
-        const json = await res.json();
-        console.log({ json });
-        return json.message;
-      }
-      throw new Error(res.statusText);
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
-  }, []);
-
-  const getMoreImages = useCallback(async () => {
-    const nasaApiData = await fetchData();
-    if (nasaApiData.length > 0) {
-      const nasaImgData = updateApiDataNewProps(nasaApiData);
-      setArticles((prev) => [...prev, ...nasaImgData]);
-    }
-  }, [fetchData]);
-
+  const [isFetching, isError, getMoreImages] = useFetch(setArticles);
   const [sentinelRef, isLoading] = useInfiniteScroll(getMoreImages, 350);
 
   return (
