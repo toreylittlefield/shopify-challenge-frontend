@@ -26,12 +26,62 @@ a {
   border: none;
 }
 
-@keyframes EaseIn {
+.logo-container {
+  display: grid;
+  place-content: center;
+  place-items: center;
+}
+
+.stack {
+  grid-area: 1/ 1 / 2 / 2;
+}
+
+.parent {
+  height: 120px;
+  width: 100px;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+  animation: orbit 5s linear infinite;
+}
+
+#svg-nasa-logo {
+  animation: ani-nasa-logo 1s infinite alternate both;
+  animation-delay: 1s;
+}
+
+#svg-rocket {
+  stroke: rebeccapurple;
+  fill: rebeccapurple;
+  position: absolute;
+  height: 32px;
+  width: 32px;
+}
+
+.rocket-booster {
+  animation: flame 1.3s ease-in-out infinite backwards alternate;
+}
+
+@keyframes orbit {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ani-nasa-logo {
+  100% {
+    transform: scale(0.95) rotate(-10deg);
+  }
+}
+
+@keyframes flame {
   0% {
-    opacity: 0.2;
-    background-color: brown;
+    fill: red;
+  }
+  50% {
+    fill: orange;
   }
   100% {
-    opacity: 1;
+    fill: orangered;
   }
 }
