@@ -15,7 +15,7 @@ const Iframe = ({ width = 504, height = 336, url = '', title = '' }: IframeProps
       height={height}
       src={url}
       allow="accelerometer; autoplay; clipboard-write;
-  encrypted-media; gyroscope; picture-in-picture"
+  encrypted-media; gyroscope; picture-in-picture; full-screen"
     />
   );
 };
