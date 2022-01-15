@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { NASA_API_KEY } from './utils';
+import { NASA_API_KEY } from '../../lib';
 import { EndPoints, NasaImageObj, NasaSearchParams } from '../../types/nasa-api-data';
 import { URLSearchParams } from 'url';
 

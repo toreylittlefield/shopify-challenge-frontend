@@ -1,7 +1,7 @@
 export type EndPoints = 'https://api.nasa.gov/planetary/apod';
 
 export interface NasaSearchParams {
-  api_key: string;
+  api_key?: string;
   date?: Date;
   concept_tags?: boolean;
   hd?: boolean;

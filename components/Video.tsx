@@ -4,7 +4,12 @@ import { VideoProps } from '../types/video';
 import { toBase64, shimmer } from '../utils';
 import Iframe from './Iframe';
 
-const Video = ({ url = '', thumbnail_url = '', title = '', index = 2 }: VideoProps) => {
+const Video = ({
+  url = '',
+  thumbnail_url = 'https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png',
+  title = '',
+  index = 2,
+}: VideoProps) => {
   const [showVideo, setShowVideo] = useState(false);
   return (
     <Fragment key={url}>
