@@ -17,15 +17,19 @@ export interface NasaApiObj {
   explanation: string;
   hdurl: string;
   media_type: string;
-  serviceVersion: string;
+  service_version: string;
   title: string;
   url: string;
   thumbnail_url: string;
 }
 
-interface UpdatedImgObj extends NasaApiObj {
+interface UpdatedImgObj extends Omit<NasaApiObj, 'date' | 'url'> {
   id: string;
   earth_date: Date;
+  liked: boolean;
+  imageBase64: string | undefined;
+  srcURL: string | URL;
+  liked: boolean;
 }
 
 export type NasaImageObj = Omit<UpdatedImgOb, 'date'>;
