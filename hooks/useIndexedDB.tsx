@@ -22,7 +22,7 @@ type GetEntry = (id: string) => Promise<{ error: boolean; result: IndexedDBObjec
 const DB_NAME: DatabaseName = 'spacestagram-db';
 const STORE_NAME: ObjectStoreName = 'spacestagram-store';
 
-const useIndexexDB = (
+const useIndexedDB = (
   data?: any[]
 ): [
   IndexedDBObject[],
@@ -184,4 +184,4 @@ const useIndexexDB = (
   return [imagesData, { addEntry, deleteEntry, clearObjectStore, getEntry }, setImagesData, dbRef.current];
 };
 
-export default useIndexexDB;
+export { useIndexedDB };

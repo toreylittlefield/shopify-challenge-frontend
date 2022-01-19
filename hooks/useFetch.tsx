@@ -47,4 +47,4 @@ function useFetch(
   return [isLoading, isError, getMoreImages];
 }
 
-export default useFetch;
+export { useFetch };
