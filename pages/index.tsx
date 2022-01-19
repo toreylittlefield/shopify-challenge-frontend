@@ -8,13 +8,9 @@ import { InferGetStaticPropsType } from 'next';
 import { NasaApiObj, NasaImageObj } from '../types/nasa-api-data';
 import { getImageDataAPI } from './api/getNasaData';
 import { updateApiDataNewProps } from '../utils';
-import Article from '../components/Article';
-import useInfiniteScroll from '../hooks/useInfiniteScroll';
-import { useCallback, useState } from 'react';
-import useFetch from '../hooks/useFetch';
-import LoadingContent from '../components/LoadingContent';
-import RocketLogo from '../components/RocketLogo';
-import NASALogo from '../components/NASALogo';
+import { useState } from 'react';
+import { Article, LoadingContent, NASALogo, RocketLogo } from '../components';
+import { useFetch, useInfiniteScroll, useIndexedDB } from '../hooks';
 type Props = {
   data: [] | NasaImageObj[];
 };
@@ -48,6 +44,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
 
   const [isFetching, isError, getMoreImages] = useFetch(setArticles);
   const [sentinelRef, isLoading] = useInfiniteScroll(getMoreImages, 350);
+  const [imagesData, { addEntry, deleteEntry, clearObjectStore }] = useIndexedDB();
 
   return (
     <div className={styles.container}>
@@ -60,9 +57,9 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
         <main className={styles.main}>
           <h1 className={styles.title}>Spacestagram</h1>
           <div className={styles.grid}>
-            {/* {articles.map((imgObj, index) => {
+            {articles.map((imgObj, index) => {
               return <Article key={imgObj.id} {...{ ...imgObj, index }} />;
-            })} */}
+            })}
           </div>
           {(isLoading || isFetching) && <LoadingContent />}
         </main>
