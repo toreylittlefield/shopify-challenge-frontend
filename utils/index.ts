@@ -27,33 +27,65 @@ export const updateApiDataNewProps = (nasaApiArray: NasaApiObj[] = []): NasaImag
   return updatedData;
 };
 
-export const readBlob = (blob: Blob): Promise<{ error: string | false; result: string }> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = () => {
-      resolve({ result: reader.result as string, error: false });
+export const convertToBase64URI = async (srcURL: string) => {
+  return new Promise<string | undefined>((resolve, reject) => {
+    const proxyUrl = `/_next/image?url=${srcURL}&w=1200&q=100`;
+    const img = new Image();
+    img.src = proxyUrl + srcURL;
+    img.onload = () => {
+      let canvas: HTMLCanvasElement | null = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (ctx === null) {
+        reject();
+        return;
+      }
+      canvas.height = img.naturalHeight;
+      canvas.width = img.naturalWidth;
+      ctx.drawImage(img, 0, 0);
+      const dataURL = canvas.toDataURL('image/jpeg', 1);
+      canvas = null;
+      img.remove();
+      resolve(dataURL);
     };
-    reader.onerror = () => {
-      reject({ error: 'error converting to blob', result: '' });
+    img.onerror = () => {
+      console.error('failed to convert image to base64');
+      reject();
     };
+    img.crossOrigin = 'Anonymous';
   });
 };
+// addDataImageEntry(srcURL, image, uuid);
 
-export const fetchImageBlob = async (srcURL: string) => {
-  try {
-    const res = await fetch(srcURL);
-    if (res.ok) {
-      const blob = await res.blob();
-      if (blob.type.startsWith('image')) {
-        return { error: false, blob };
-      }
-      throw new Error(JSON.stringify({ status: res.status, blobType: blob.type }));
-    }
-    const { status, statusText } = res;
-    throw new Error(JSON.stringify({ status, statusText }));
-  } catch (error) {
-    console.error(error);
-    return { error: true, errorReason: error };
-  }
-};
+// export const readBlob = (blob: Blob): Promise<{ error: string | false; result: string }> => {
+//   return new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.readAsDataURL(blob);
+//     reader.onloadend = () => {
+//       resolve({ result: reader.result as string, error: false });
+//     };
+//     reader.onerror = () => {
+//       reject({ error: 'error converting to blob', result: '' });
+//     };
+//   });
+// };
+
+// export const fetchImageBlob = async (srcURL: string) => {
+//   try {
+//     const res = await fetch('/api/getblobimage');
+//     if (res.ok) {
+//       console.log(res);
+//       const json = await res.blob();
+//       console.log({ json });
+//       const blob = json.message;
+//       if (blob.type.startsWith('image')) {
+//         return { error: false, blob };
+//       }
+//       throw new Error(JSON.stringify({ status: res.status, blobType: blob.type }));
+//     }
+//     const { status, statusText } = res;
+//     throw new Error(JSON.stringify({ status, statusText }));
+//   } catch (error) {
+//     console.error(error);
+//     return { error: true, errorReason: error };
+//   }
+// };
