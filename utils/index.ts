@@ -27,11 +27,12 @@ export const updateApiDataNewProps = (nasaApiArray: NasaApiObj[] = []): NasaImag
   return updatedData;
 };
 
+export const nextImageURL = (srcURL: string) => `/_next/image?url=${srcURL}&w=1200&q=100`;
+
 export const convertToBase64URI = async (srcURL: string) => {
   return new Promise<string | undefined>((resolve, reject) => {
-    const proxyUrl = `/_next/image?url=${srcURL}&w=1200&q=100`;
     const img = new Image();
-    img.src = proxyUrl + srcURL;
+    img.src = nextImageURL(srcURL);
     img.onload = () => {
       let canvas: HTMLCanvasElement | null = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
