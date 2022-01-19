@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { InferGetStaticPropsType } from 'next';
 import styles from '../styles/Home.module.css';
 import { useState } from 'react';
-import { Page, Spinner } from '@shopify/polaris';
+import { Frame, Page, Spinner } from '@shopify/polaris';
 import { ImportMinor } from '@shopify/polaris-icons';
 import { NasaApiObj, NasaImageObj } from '../types/nasa-api-data';
 import { getImageDataAPI } from './api/getnasadata';
@@ -53,20 +53,27 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
         <meta name="description" content="Spacestagram- by Torey Littlefield" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {imagesData.map(({ imageBase64, liked, srcURL, uuid }) => (
+      {/* {imagesData.map(({ imageBase64, liked, srcURL, uuid }) => (
         <Image key={uuid} alt="liked" src={imageBase64} width={250} height={250} layout="responsive" />
-      ))}
-      <Page title="Polaris" breadcrumbs={breadcrumbs} primaryAction={primaryAction} secondaryActions={secondaryActions}>
-        <main className={styles.main}>
-          <h1 className={styles.title}>Spacestagram</h1>
-          <div className={styles.grid}>
-            {articles.map((imgObj, index) => {
-              return <Article key={imgObj.id} {...{ ...imgObj, index, addEntry, deleteEntry }} />;
-            })}
-          </div>
-          {(isLoading || isFetching) && <LoadingContent />}
-        </main>
-      </Page>
+      ))} */}
+      <Frame>
+        <Page
+          title="Polaris"
+          breadcrumbs={breadcrumbs}
+          primaryAction={primaryAction}
+          secondaryActions={secondaryActions}
+        >
+          <main className={styles.main}>
+            <h1 className={styles.title}>Spacestagram</h1>
+            <div className={styles.grid}>
+              {articles.map((imgObj, index) => {
+                return <Article key={imgObj.id} {...{ ...imgObj, index, addEntry, deleteEntry }} />;
+              })}
+            </div>
+            {(isLoading || isFetching) && <LoadingContent />}
+          </main>
+        </Page>
+      </Frame>
 
       <footer ref={sentinelRef} className={styles.footer}>
         <a href="https://www.github.com/toreylittlefield" target="_blank" rel="noopener noreferrer">
