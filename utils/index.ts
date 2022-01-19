@@ -26,3 +26,34 @@ export const updateApiDataNewProps = (nasaApiArray: NasaApiObj[] = []): NasaImag
 
   return updatedData;
 };
+
+export const readBlob = (blob: Blob): Promise<{ error: string | false; result: string }> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      resolve({ result: reader.result as string, error: false });
+    };
+    reader.onerror = () => {
+      reject({ error: 'error converting to blob', result: '' });
+    };
+  });
+};
+
+export const fetchImageBlob = async (srcURL: string) => {
+  try {
+    const res = await fetch(srcURL);
+    if (res.ok) {
+      const blob = await res.blob();
+      if (blob.type.startsWith('image')) {
+        return { error: false, blob };
+      }
+      throw new Error(JSON.stringify({ status: res.status, blobType: blob.type }));
+    }
+    const { status, statusText } = res;
+    throw new Error(JSON.stringify({ status, statusText }));
+  } catch (error) {
+    console.error(error);
+    return { error: true, errorReason: error };
+  }
+};
