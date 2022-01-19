@@ -1,23 +1,17 @@
 import { SetStateAction, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
 import { convertToBase64URI } from '../utils';
+import { UpdatedImgObj } from '../types/nasa-api-data';
 
 type DatabaseName = 'spacestagram-db';
 type ObjectStoreName = 'spacestagram-store';
-
-type IndexedDBObject = {
-  uuid: string;
-  imageBase64: string;
-  srcURL: string | URL;
-  liked: boolean;
-};
 
 type IndexedDBResult = {
   data: string;
   id: string;
 };
 
-type GetEntry = (id: string) => Promise<{ error: boolean; result: IndexedDBObject | {} }>;
+type GetEntry = (id: string) => Promise<{ error: boolean; result: UpdatedImgObj | {} }>;
 
 const DB_NAME: DatabaseName = 'spacestagram-db';
 const STORE_NAME: ObjectStoreName = 'spacestagram-store';
@@ -25,9 +19,9 @@ const STORE_NAME: ObjectStoreName = 'spacestagram-store';
 const useIndexedDB = (
   data?: any[]
 ): [
-  IndexedDBObject[],
+  UpdatedImgObj[],
   {
-    addEntry: (srcURL: string, id?: string) => void;
+    addEntry: (imgObject: UpdatedImgObj) => void;
     deleteEntry: (id: string) => void;
     clearObjectStore: () => void;
     getEntry: GetEntry;
@@ -35,7 +29,7 @@ const useIndexedDB = (
   React.Dispatch<SetStateAction<any[]>>,
   IDBDatabase | null
 ] => {
-  const [imagesData, setImagesData] = useState<IndexedDBObject[]>([]);
+  const [imagesData, setImagesData] = useState<UpdatedImgObj[]>([]);
   const dbRef = useRef<IDBDatabase | null>(null);
 
   function transaction(storeName: ObjectStoreName, mode: IDBTransactionMode, callback?: Function) {
@@ -59,7 +53,7 @@ const useIndexedDB = (
     objectStore.getAll().onsuccess = (event) => {
       const { result } = event.target as IDBRequest;
       if (Array.isArray(result)) {
-        const parsedData: IndexedDBObject[] = result.map((obj) => {
+        const parsedData: UpdatedImgObj[] = result.map((obj) => {
           const data = JSON.parse(obj.data);
           return data;
         });
@@ -116,7 +110,7 @@ const useIndexedDB = (
           const request = event.target as IDBRequest;
           const result: IndexedDBResult = request.result;
           if (result) {
-            const dataObject: IndexedDBObject = JSON.parse(result.data);
+            const dataObject: UpdatedImgObj = JSON.parse(result.data);
             returnObj.result = dataObject;
             resolve(returnObj);
           } else {
@@ -133,27 +127,28 @@ const useIndexedDB = (
     });
   };
 
-  const addEntry = async (srcURL: string, id?: string) => {
+  const addEntry = async (imgObject: UpdatedImgObj) => {
     if (dbRef.current instanceof IDBDatabase) {
-      if (id) {
+      if (imgObject.id) {
         // check if id already exists
-        const { error, result } = await getEntry(id);
+        const { error, result } = await getEntry(imgObject.id);
         if (error || Object.keys(result).length > 0) return;
       }
+      let imageBase64: string | undefined = '';
+      if (imgObject.media_type !== 'video') {
+        imageBase64 = await convertToBase64URI(imgObject.srcURL as string);
+        if (!imageBase64) return;
+      }
 
-      const imageBase64 = await convertToBase64URI(srcURL);
-      if (!imageBase64) return;
+      const dbObj = { ...imgObject, imageBase64 };
+      if (!dbObj.id) {
+        dbObj.id = nanoid();
+      }
 
-      const dbObj: IndexedDBObject = {
-        uuid: id || nanoid(),
-        imageBase64: imageBase64,
-        srcURL: srcURL,
-        liked: true,
-      };
       const data = JSON.stringify(dbObj);
       const objectStore = transaction('spacestagram-store', 'readwrite');
       if (!objectStore) return;
-      objectStore.add({ data, id: dbObj.uuid }).onsuccess = () => {
+      objectStore.add({ data, id: dbObj.id }).onsuccess = () => {
         setImagesData((prev) => [...prev, dbObj]);
       };
     }
@@ -164,7 +159,7 @@ const useIndexedDB = (
       const objectStore = transaction('spacestagram-store', 'readwrite');
       if (!objectStore) return;
       objectStore.delete(id).onsuccess = () => {
-        setImagesData((prev) => prev.filter((obj) => obj.uuid !== id));
+        setImagesData((prev) => prev.filter((obj) => obj.id !== id));
       };
     }
   };
