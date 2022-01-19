@@ -9,24 +9,24 @@ const Article = ({
   date = new Date(),
   explanation = '',
   title = '',
-  url = 'https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png',
-  media_type = '',
+  srcURL = 'https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png',
   thumbnail_url = '',
   id = '',
-  addEntry = (id: string) => {},
   index = 2,
+  ...rest
 }) => {
   const blurDataURL = `data:image/svg+xml;base64,${toBase64(shimmer('336', '504'))}`;
-
+  const { media_type, addEntry, deleteEntry } = rest;
+  console.log([rest]);
   return (
     <article className="article-container">
       <figure>
         {media_type === 'video' ? (
-          <Video key={url} {...{ title, url, index, thumbnail_url }} />
+          <Video key={id} {...{ title, srcURL, index, thumbnail_url }} />
         ) : (
           <Image
             priority={index === 0 || index === 1}
-            src={url}
+            src={srcURL}
             alt={title}
             height={336}
             width={504}
@@ -39,7 +39,14 @@ const Article = ({
         </figcaption>
         <p>{explanation}</p>
         <sub>{copyright}</sub>
-        <CardButtons id={id} title={title} imageSrc={url} addEntry={addEntry} />
+        <CardButtons
+          id={id}
+          title={title}
+          srcURL={srcURL}
+          addEntry={addEntry}
+          deleteEntry={deleteEntry}
+          {...{ ...rest, copyright, explanation, thumbnail_url }}
+        />
       </figure>
     </article>
   );
