@@ -11,4 +11,4 @@ const LoadingContent = () => {
   );
 };
 
-export default LoadingContent;
+export { LoadingContent };

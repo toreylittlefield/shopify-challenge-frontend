@@ -37,4 +37,4 @@ const RocketLogo = ({ height = 42, width = 42 }: PropTypes) => {
   );
 };
 
-export default RocketLogo;
+export { RocketLogo };

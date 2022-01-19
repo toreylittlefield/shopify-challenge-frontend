@@ -64,4 +64,4 @@ const NASALogo = ({ height = 42, width = 42, ...props }: PropTypes) => {
   );
 };
 
-export default NASALogo;
+export { NASALogo };

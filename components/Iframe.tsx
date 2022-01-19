@@ -20,4 +20,4 @@ const Iframe = ({ width = 504, height = 336, url = '', title = '' }: IframeProps
   );
 };
 
-export default Iframe;
+export { Iframe };

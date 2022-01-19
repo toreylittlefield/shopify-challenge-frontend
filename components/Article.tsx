@@ -42,4 +42,4 @@ const Article = ({
   );
 };
 
-export default Article;
+export { Article };
