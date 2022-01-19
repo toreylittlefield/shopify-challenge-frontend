@@ -39,7 +39,7 @@ const Article = ({
         </figcaption>
         <p>{explanation}</p>
         <sub>{copyright}</sub>
-        <CardButtons id={id} imageSrc={url} addEntry={addEntry} />
+        <CardButtons id={id} title={title} imageSrc={url} addEntry={addEntry} />
       </figure>
     </article>
   );
