@@ -1,14 +1,14 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
+import { InferGetStaticPropsType } from 'next';
 import styles from '../styles/Home.module.css';
+import { useState } from 'react';
 import { Page, Spinner } from '@shopify/polaris';
 import { ImportMinor } from '@shopify/polaris-icons';
-import { InferGetStaticPropsType } from 'next';
 import { NasaApiObj, NasaImageObj } from '../types/nasa-api-data';
-import { getImageDataAPI } from './api/getNasaData';
+import { getImageDataAPI } from './api/getnasadata';
 import { updateApiDataNewProps } from '../utils';
-import { useState } from 'react';
 import { Article, LoadingContent, NASALogo, RocketLogo } from '../components';
 import { useFetch, useInfiniteScroll, useIndexedDB } from '../hooks';
 type Props = {
@@ -53,12 +53,15 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
         <meta name="description" content="Spacestagram- by Torey Littlefield" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      {imagesData.map(({ imageBase64, liked, srcURL, uuid }) => (
+        <Image key={uuid} alt="liked" src={imageBase64} width={250} height={250} layout="responsive" />
+      ))}
       <Page title="Polaris" breadcrumbs={breadcrumbs} primaryAction={primaryAction} secondaryActions={secondaryActions}>
         <main className={styles.main}>
           <h1 className={styles.title}>Spacestagram</h1>
           <div className={styles.grid}>
             {articles.map((imgObj, index) => {
-              return <Article key={imgObj.id} {...{ ...imgObj, index }} />;
+              return <Article key={imgObj.id} {...{ ...imgObj, index, addEntry, deleteEntry }} />;
             })}
           </div>
           {(isLoading || isFetching) && <LoadingContent />}

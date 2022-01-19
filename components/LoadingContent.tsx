@@ -1,6 +1,6 @@
 import { Spinner } from '@shopify/polaris';
 import React, { Fragment } from 'react';
-import SkeletonContent from './SkeletonContent';
+import { SkeletonContent } from './index';
 
 const LoadingContent = () => {
   return (

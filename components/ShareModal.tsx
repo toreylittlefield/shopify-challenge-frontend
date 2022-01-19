@@ -2,14 +2,14 @@ import { Button, Modal, Stack } from '@shopify/polaris';
 import { useCallback, useState } from 'react';
 import { GrLinkedin, GrFacebook, GrMail, GrTwitter, GrShareOption } from 'react-icons/gr';
 import { AiOutlineWhatsApp } from 'react-icons/ai';
-import { ImagesData } from './App';
+// import { ImagesData } from './App';
 
 type ImgProp = {
   imgSrc: string;
 };
 
 type PropTypes = ImgProp & {
-  imageObj?: ImagesData;
+  imageObj?: {};
 };
 
 const handleClick = (url: string) => {

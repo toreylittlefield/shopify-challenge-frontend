@@ -1,7 +1,8 @@
 import React from 'react';
-import Video from './Video';
+import { Video } from './index';
 import Image from 'next/image';
 import { shimmer, toBase64 } from '../utils';
+import { CardButtons } from './CardButtons';
 
 const Article = ({
   copyright = '',
@@ -12,6 +13,7 @@ const Article = ({
   media_type = '',
   thumbnail_url = '',
   id = '',
+  addEntry = (id: string) => {},
   index = 2,
 }) => {
   const blurDataURL = `data:image/svg+xml;base64,${toBase64(shimmer('336', '504'))}`;
@@ -37,6 +39,7 @@ const Article = ({
         </figcaption>
         <p>{explanation}</p>
         <sub>{copyright}</sub>
+        <CardButtons id={id} imageSrc={url} addEntry={addEntry} />
       </figure>
     </article>
   );

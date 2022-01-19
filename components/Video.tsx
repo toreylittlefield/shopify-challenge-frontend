@@ -2,7 +2,7 @@ import React, { useState, Fragment } from 'react';
 import Image from 'next/image';
 import { VideoProps } from '../types/video';
 import { toBase64, shimmer } from '../utils';
-import Iframe from './Iframe';
+import { Iframe } from './index';
 
 const Video = ({
   url = '',
