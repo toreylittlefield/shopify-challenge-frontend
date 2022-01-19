@@ -1,6 +1,6 @@
 import { SetStateAction, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
-import { fetchImageBlob, readBlob } from '../utils';
+import { convertToBase64URI } from '../utils';
 
 type DatabaseName = 'spacestagram-db';
 type ObjectStoreName = 'spacestagram-store';
@@ -140,15 +140,13 @@ const useIndexedDB = (
         const { error, result } = await getEntry(id);
         if (error || Object.keys(result).length > 0) return;
       }
-      const res = await fetchImageBlob(srcURL);
-      if (!res.blob) return;
-      const response = await readBlob(res.blob);
-      if (response.error) {
-        console.error(response.error);
-      }
+
+      const imageBase64 = await convertToBase64URI(srcURL);
+      if (!imageBase64) return;
+
       const dbObj: IndexedDBObject = {
         uuid: id || nanoid(),
-        imageBase64: response.result,
+        imageBase64: imageBase64,
         srcURL: srcURL,
         liked: true,
       };
