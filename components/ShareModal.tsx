@@ -11,7 +11,7 @@ type ImgProp = {
 };
 
 type PropTypes = ImgProp & {
-  imageObj?: {};
+  media_type?: 'image' | 'video' | string;
 };
 
 const handleClick = (url: string) => {
@@ -98,7 +98,15 @@ function getFileNameFromURL(title: string) {
   return text;
 }
 
-function createShareDataObj({ srcURL, text, file }: { srcURL: string; text: string; file: File }): ShareData {
+function createShareDataObj({ srcURL, text, file }: { srcURL: string; text: string; file?: File }): ShareData {
+  if (!file) {
+    return {
+      url: srcURL,
+      title: text,
+      text: text,
+    };
+  }
+
   return {
     url: srcURL,
     title: text,
@@ -129,12 +137,20 @@ async function makeFile(srcURL: string) {
   return file;
 }
 
-const WebShareAPIButton = ({ srcURL, title }: PropTypes) => {
+const WebShareAPIButton = ({ srcURL, media_type, title }: PropTypes) => {
   const handleButtonShare = async () => {
     if (srcURL) {
-      const file = await makeFile(srcURL);
-      const text = getFileNameFromURL(title);
-      const dataToShare = createShareDataObj({ srcURL: srcURL, text, file });
+      const createShareObj: { srcURL: string; text: string; file: undefined | File } = {
+        srcURL,
+        text: '',
+        file: undefined,
+      };
+      if (media_type !== 'video') {
+        const fileToMake = await makeFile(srcURL);
+        createShareObj.file = fileToMake;
+      }
+      createShareObj.text = getFileNameFromURL(title);
+      const dataToShare = createShareDataObj(createShareObj);
       shareData(dataToShare);
     }
   };
@@ -146,7 +162,7 @@ const WebShareAPIButton = ({ srcURL, title }: PropTypes) => {
   );
 };
 
-const ShareModal = ({ srcURL, imageObj, title }: PropTypes) => {
+const ShareModal = ({ srcURL, media_type, title }: PropTypes) => {
   const [isOpen, setIsOpen] = useState(false);
   const handleModalChange = useCallback(() => setIsOpen(!isOpen), [isOpen]);
   const handleModalClose = () => {
@@ -184,7 +200,7 @@ const ShareModal = ({ srcURL, imageObj, title }: PropTypes) => {
           <TwitterShareButton srcURL={srcURL} title={title} />
           <MailToShareButton srcURL={srcURL} title={title} />
           <WhatsAppShareButton srcURL={srcURL} title={title} />
-          <WebShareAPIButton srcURL={srcURL} title={title} />
+          <WebShareAPIButton srcURL={srcURL} media_type={media_type} title={title} />
         </Stack>
       </Modal.Section>
     </Modal>
