@@ -18,7 +18,7 @@ export const shimmer = (w: string, h: string) => `
 export const toBase64 = (str: string) =>
   typeof window === 'undefined' ? Buffer.from(str).toString('base64') : window.btoa(str);
 
-export const updateApiDataNewProps = (nasaApiArray: NasaApiObj[] = []): NasaImageObj[] => {
+export const updateApiDataNewProps = (nasaApiArray: NasaApiObj[] = []): UpdatedImgObj[] => {
   const updatedData: UpdatedImgObj[] = nasaApiArray.map((imgObj) => {
     const { date, url, ...rest } = imgObj;
     return { ...rest, srcURL: url, imageBase64: '', earth_date: date, id: nanoid(), liked: false };
@@ -31,6 +31,7 @@ export const nextImageURL = (srcURL: string) => `/_next/image?url=${srcURL}&w=12
 export const convertToBase64URI = async (srcURL: string) => {
   return new Promise<string | undefined>((resolve, reject) => {
     const img = new Image();
+    if (!srcURL) reject(console.warn('need to pass a URL'));
     img.src = nextImageURL(srcURL);
     img.onload = () => {
       let canvas: HTMLCanvasElement | null = document.createElement('canvas');
