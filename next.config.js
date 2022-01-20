@@ -3,7 +3,7 @@ module.exports = {
   reactStrictMode: true,
   images: {
     domains: [
-      'www.nasa.gov/',
+      'www.nasa.gov',
       'apod.nasa.gov',
       'i.vimeocdn.com',
       'vimeocdn.com',

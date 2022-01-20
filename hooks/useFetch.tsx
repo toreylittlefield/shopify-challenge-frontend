@@ -1,14 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { updateApiDataNewProps } from '../utils';
 import { NasaSearchParams } from '../types/nasa-api-data';
-import { URL } from 'url';
-import { NASA_API_KEY } from '../lib';
 
 type SetStateAction<S> = S | ((prevState: S) => S);
 
 function useFetch(
   setState: SetStateAction<(prevState?: any) => any | void> = () => {},
-  url: string = '/api/getNasaData',
+  url: string = '/api/getnasadata',
   params?: NasaSearchParams
 ): [boolean, { isError: boolean; message: string }, typeof getMoreImages] {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +19,6 @@ function useFetch(
       const res = await fetch(`${url}?${paramOptions.toString()}`);
       if (res.ok) {
         const json = await res.json();
-        console.log({ json });
         setIsError({ isError: true, message: '' });
 
         return json.message;
@@ -47,4 +44,4 @@ function useFetch(
   return [isLoading, isError, getMoreImages];
 }
 
-export default useFetch;
+export { useFetch };

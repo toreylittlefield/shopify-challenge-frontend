@@ -43,4 +43,4 @@ const useInfiniteScroll = (
   return [elementRef, isLoading];
 };
 
-export default useInfiniteScroll;
+export { useInfiniteScroll };

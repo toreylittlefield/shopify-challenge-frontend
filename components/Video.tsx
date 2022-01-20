@@ -2,17 +2,17 @@ import React, { useState, Fragment } from 'react';
 import Image from 'next/image';
 import { VideoProps } from '../types/video';
 import { toBase64, shimmer } from '../utils';
-import Iframe from './Iframe';
+import { Iframe } from './index';
 
 const Video = ({
-  url = '',
+  srcURL = '',
   thumbnail_url = 'https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png',
   title = '',
   index = 2,
 }: VideoProps) => {
   const [showVideo, setShowVideo] = useState(false);
   return (
-    <Fragment key={url}>
+    <Fragment key={srcURL}>
       <h2>Video: {title}</h2>
       {showVideo === false && (
         <Image
@@ -28,9 +28,9 @@ const Video = ({
           onLoadingComplete={() => setShowVideo(true)}
         />
       )}
-      {showVideo === true && <Iframe height={336} width={504} title={title} url={url} />}
+      {showVideo === true && <Iframe height={336} width={504} title={title} srcURL={srcURL} />}
     </Fragment>
   );
 };
 
-export default Video;
+export { Video };

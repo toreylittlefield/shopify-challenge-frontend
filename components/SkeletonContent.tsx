@@ -53,4 +53,4 @@ const SkeletonContent = () => {
   );
 };
 
-export default SkeletonContent;
+export { SkeletonContent };
