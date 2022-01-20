@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { shimmer, toBase64 } from '../utils';
 import { CardButtons } from './CardButtons';
 import { UpdatedImgObj } from '../types/nasa-api-data';
+import { Card } from '@shopify/polaris';
 
 type PropType = UpdatedImgObj & {
   index: number;
@@ -28,33 +29,43 @@ const Article = ({
 
   return (
     <article className="article-container">
-      <figure>
-        {rest.media_type === 'video' ? (
-          <Video key={id} {...{ title, srcURL, index, thumbnail_url }} />
-        ) : (
-          <Image
-            priority={index === 0 || index === 1}
-            src={srcURL}
-            alt={title}
-            height={336}
-            width={504}
-            placeholder="blur"
-            blurDataURL={blurDataURL}
-          />
-        )}
-        <figcaption>
-          {title} ::::
-          {earth_date}
-        </figcaption>
-        <p>{explanation}</p>
-        <sub>{copyright}</sub>
-        <CardButtons
-          id={id}
-          title={title}
-          srcURL={srcURL}
-          {...{ ...rest, setArticles: rest.setArticles, earth_date, copyright, explanation, thumbnail_url }}
-        />
-      </figure>
+      <Card sectioned title={title}>
+        <figure>
+          <Card.Section>
+            {rest.media_type === 'video' ? (
+              <Video key={id} {...{ title, srcURL, index, thumbnail_url }} />
+            ) : (
+              <Image
+                priority={index === 0 || index === 1}
+                src={srcURL}
+                alt={title}
+                height={336}
+                width={504}
+                placeholder="blur"
+                blurDataURL={blurDataURL}
+              />
+            )}
+          </Card.Section>
+          <Card.Section>
+            <figcaption>
+              {title} ::::
+              {earth_date}
+            </figcaption>
+          </Card.Section>
+          <Card.Section>
+            <p>{explanation}</p>
+            <sub>{copyright}</sub>
+          </Card.Section>
+          <Card.Section>
+            <CardButtons
+              id={id}
+              title={title}
+              srcURL={srcURL}
+              {...{ ...rest, setArticles: rest.setArticles, earth_date, copyright, explanation, thumbnail_url }}
+            />
+          </Card.Section>
+        </figure>
+      </Card>
     </article>
   );
 };
