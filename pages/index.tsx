@@ -2,17 +2,17 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { InferGetStaticPropsType } from 'next';
 import styles from '../styles/Home.module.css';
-import { useState } from 'react';
-import { Frame, MenuActionDescriptor, Page, PageActions, Spinner } from '@shopify/polaris';
-import { NasaApiObj, UpdatedImgObj } from '../types/nasa-api-data';
+import { Fragment, useState } from 'react';
+import { Frame, MenuActionDescriptor, Page, PageActions } from '@shopify/polaris';
+import { NasaApiObj } from '../types/nasa-api-data';
 import { getImageDataAPI } from './api/getnasadata';
 import { updateApiDataNewProps } from '../utils';
 import { Article, LoadingContent, NASALogo, RocketLogo } from '../components';
 import { useFetch, useInfiniteScroll, useIndexedDB } from '../hooks';
 import { FcFeedIn, FcLike } from 'react-icons/fc';
+import { RiDeleteBin4Line } from 'react-icons/ri';
 
 export const getStaticProps = async () => {
-  // ...
   const { json = false, status, statusText } = await getImageDataAPI();
 
   if (!json) {
@@ -35,6 +35,8 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
   const [sentinelRef, isLoading] = useInfiniteScroll(getMoreImages, 350);
   const [imagesData, { addEntry, deleteEntry, clearObjectStore }] = useIndexedDB();
   const [viewFeed, setViewFeed] = useState(true);
+
+  const DeleteAllIcon = <RiDeleteBin4Line fillOpacity={100} color="white" />;
 
   const primaryAction = {
     content: 'View Feed',
@@ -64,8 +66,6 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
           subtitle="NASA"
           secondaryActions={secondaryActions}
         >
-          <PageActions />
-
           <main className={styles.main}>
             <h1 className={styles.title}>Spacestagram</h1>
             <div className={styles.grid}>
@@ -73,24 +73,38 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
                 articles.map((imgObj, index) => {
                   return <Article key={imgObj.id} {...{ ...imgObj, setArticles, index, addEntry, deleteEntry }} />;
                 })}
-              {!viewFeed &&
-                imagesData.map((imgObj, index) => {
-                  const srcURL = imgObj.media_type === 'video' ? imgObj.srcURL : imgObj.imageBase64 || imgObj.srcURL;
-                  return (
-                    <Article
-                      key={imgObj.id}
-                      {...{
-                        ...imgObj,
-                        setArticles,
-                        media_type: imgObj.media_type,
-                        srcURL: srcURL,
-                        index,
-                        deleteEntry,
-                        buttonType: 'Delete',
-                      }}
-                    />
-                  );
-                })}
+              {!viewFeed && (
+                <Fragment>
+                  <PageActions
+                    secondaryActions={[
+                      {
+                        content: 'Remove All Favorites',
+                        onAction: () => clearObjectStore(),
+                        disabled: imagesData.length === 0,
+                        destructive: true,
+                        icon: DeleteAllIcon as any,
+                      },
+                    ]}
+                  />
+                  {imagesData.map((imgObj, index) => {
+                    const srcURL = imgObj.media_type === 'video' ? imgObj.srcURL : imgObj.imageBase64 || imgObj.srcURL;
+                    return (
+                      <Article
+                        key={imgObj.id}
+                        {...{
+                          ...imgObj,
+                          setArticles,
+                          media_type: imgObj.media_type,
+                          srcURL: srcURL,
+                          index,
+                          deleteEntry,
+                          buttonType: 'Delete',
+                        }}
+                      />
+                    );
+                  })}
+                </Fragment>
+              )}
             </div>
             {viewFeed && (isLoading || isFetching) && <LoadingContent />}
           </main>
