@@ -1,19 +1,15 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import { InferGetStaticPropsType } from 'next';
 import styles from '../styles/Home.module.css';
 import { useState } from 'react';
-import { Frame, Page, Spinner } from '@shopify/polaris';
-import { ImportMinor } from '@shopify/polaris-icons';
-import { NasaApiObj, NasaImageObj } from '../types/nasa-api-data';
+import { Frame, MenuActionDescriptor, Page, PageActions, Spinner } from '@shopify/polaris';
+import { NasaApiObj, UpdatedImgObj } from '../types/nasa-api-data';
 import { getImageDataAPI } from './api/getnasadata';
 import { updateApiDataNewProps } from '../utils';
 import { Article, LoadingContent, NASALogo, RocketLogo } from '../components';
 import { useFetch, useInfiniteScroll, useIndexedDB } from '../hooks';
-type Props = {
-  data: [] | NasaImageObj[];
-};
+import { FcFeedIn, FcLike } from 'react-icons/fc';
 
 export const getStaticProps = async () => {
   // ...
@@ -32,45 +28,65 @@ export const getStaticProps = async () => {
   };
 };
 
-const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data = [], status, statusText }) => {
-  const breadcrumbs = [
-    { content: 'Sample apps', url: '/sample-apps' },
-    { content: 'Create React App', url: '/create-react-app' },
-  ];
-  const primaryAction = { content: 'New product' };
-  const secondaryActions = [{ content: 'Import', icon: ImportMinor }];
-
+const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data = [] }) => {
   const [articles, setArticles] = useState(data);
 
   const [isFetching, isError, getMoreImages] = useFetch(setArticles);
   const [sentinelRef, isLoading] = useInfiniteScroll(getMoreImages, 350);
   const [imagesData, { addEntry, deleteEntry, clearObjectStore }] = useIndexedDB();
+  const [viewFeed, setViewFeed] = useState(true);
+
+  const primaryAction = {
+    content: 'View Feed',
+    icon: FcFeedIn,
+    onAction: () => setViewFeed(true),
+  };
+  const secondaryActions: MenuActionDescriptor[] = [
+    {
+      content: 'View Favorites',
+      icon: FcLike,
+      onAction: () => setViewFeed(false),
+    },
+  ];
 
   return (
     <div className={styles.container}>
       <Head>
-        <title>Create Next App</title>
-        <meta name="description" content="Spacestagram- by Torey Littlefield" />
+        <title>Spacestagram - by Torey Littlefield</title>
+        <meta name="description" content="Spacestagram - by Torey Littlefield" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* {imagesData.map(({ imageBase64, liked, srcURL, uuid }) => (
-        <Image key={uuid} alt="liked" src={imageBase64} width={250} height={250} layout="responsive" />
-      ))} */}
       <Frame>
-        <Page
-          title="Polaris"
-          breadcrumbs={breadcrumbs}
-          primaryAction={primaryAction}
-          secondaryActions={secondaryActions}
-        >
+        <Page title="Spacestagram" primaryAction={primaryAction} subtitle="NASA" secondaryActions={secondaryActions}>
+          <PageActions />
+
           <main className={styles.main}>
             <h1 className={styles.title}>Spacestagram</h1>
             <div className={styles.grid}>
-              {articles.map((imgObj, index) => {
-                return <Article key={imgObj.id} {...{ ...imgObj, index, addEntry, deleteEntry }} />;
-              })}
+              {viewFeed &&
+                articles.map((imgObj, index) => {
+                  return <Article key={imgObj.id} {...{ ...imgObj, setArticles, index, addEntry, deleteEntry }} />;
+                })}
+              {!viewFeed &&
+                imagesData.map((imgObj, index) => {
+                  const srcURL = imgObj.media_type === 'video' ? imgObj.srcURL : imgObj.imageBase64 || imgObj.srcURL;
+                  return (
+                    <Article
+                      key={imgObj.id}
+                      {...{
+                        ...imgObj,
+                        setArticles,
+                        media_type: imgObj.media_type,
+                        srcURL: srcURL,
+                        index,
+                        deleteEntry,
+                        buttonType: 'Delete',
+                      }}
+                    />
+                  );
+                })}
             </div>
-            {(isLoading || isFetching) && <LoadingContent />}
+            {viewFeed && (isLoading || isFetching) && <LoadingContent />}
           </main>
         </Page>
       </Frame>
