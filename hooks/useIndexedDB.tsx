@@ -129,28 +129,32 @@ const useIndexedDB = (
 
   const addEntry = async (imgObject: UpdatedImgObj) => {
     if (dbRef.current instanceof IDBDatabase) {
-      if (imgObject.id) {
-        // check if id already exists
-        const { error, result } = await getEntry(imgObject.id);
-        if (error || Object.keys(result).length > 0) return;
-      }
-      let imageBase64: string | undefined = '';
-      if (imgObject.media_type !== 'video') {
-        imageBase64 = await convertToBase64URI(imgObject.srcURL as string);
-        if (!imageBase64) return;
-      }
+      try {
+        if (imgObject.id) {
+          // check if id already exists
+          const { error, result } = await getEntry(imgObject.id);
+          if (error || Object.keys(result).length > 0) return;
+        }
+        let imageBase64: string | undefined = '';
+        if (imgObject.media_type !== 'video' && imgObject.thumbnail_url === '') {
+          imageBase64 = await convertToBase64URI(imgObject.srcURL as string);
+          if (!imageBase64) return;
+        }
 
-      const dbObj = { ...imgObject, imageBase64 };
-      if (!dbObj.id) {
-        dbObj.id = nanoid();
-      }
+        const dbObj = { ...imgObject, imageBase64 };
+        if (!dbObj.id) {
+          dbObj.id = nanoid();
+        }
 
-      const data = JSON.stringify(dbObj);
-      const objectStore = transaction('spacestagram-store', 'readwrite');
-      if (!objectStore) return;
-      objectStore.add({ data, id: dbObj.id }).onsuccess = () => {
-        setImagesData((prev) => [...prev, dbObj]);
-      };
+        const data = JSON.stringify(dbObj);
+        const objectStore = transaction('spacestagram-store', 'readwrite');
+        if (!objectStore) return;
+        objectStore.add({ data, id: dbObj.id }).onsuccess = () => {
+          setImagesData((prev) => [...prev, dbObj]);
+        };
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
