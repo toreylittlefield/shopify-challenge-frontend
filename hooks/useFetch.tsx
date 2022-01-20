@@ -1,8 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { updateApiDataNewProps } from '../utils';
 import { NasaSearchParams } from '../types/nasa-api-data';
-import { URL } from 'url';
-import { NASA_API_KEY } from '../lib';
 
 type SetStateAction<S> = S | ((prevState: S) => S);
 
