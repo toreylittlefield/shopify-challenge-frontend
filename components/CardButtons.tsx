@@ -52,7 +52,7 @@ const CardButtons = ({
   return (
     <Fragment>
       <ButtonGroup>
-        <ShareModal srcURL={srcURL} title={title} />
+        <ShareModal media_type={rest.media_type} srcURL={srcURL} title={title} />
         <Button
           icon={buttonType === 'Like' ? likeIcon : <FiDelete fillOpacity={0} color="red" />}
           onClick={() => {
