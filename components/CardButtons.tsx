@@ -1,36 +1,60 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, SetStateAction, useCallback, useState } from 'react';
 import { ButtonGroup, Button, Toast } from '@shopify/polaris';
 import { ShareModal } from './ShareModal';
 import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
 import { FiDelete } from 'react-icons/fi';
-import { NasaImageObj, UpdatedImgObj } from '../types/nasa-api-data';
-// import { ImagesData } from './App';
+import { UpdatedImgObj } from '../types/nasa-api-data';
 
-type PropTypes = {
+type PropTypes = UpdatedImgObj & {
   srcURL: string;
   id: string;
   title: string;
-  addEntry?: (imgObject: NasaImageObj) => void;
+  addEntry?: (imgObject: UpdatedImgObj) => void;
   deleteEntry?: (id: string) => void;
   buttonType?: 'Like' | 'Delete';
+  liked: boolean;
+  setArticles: (prev?: SetStateAction<any>) => void;
 };
 
-const CardButtons = ({ id, title, srcURL, addEntry, deleteEntry, buttonType = 'Like', ...rest }: PropTypes) => {
-  const [toggleLike, setToggleLike] = useState(false);
+const CardButtons = ({
+  id,
+  title,
+  srcURL,
+  addEntry,
+  deleteEntry,
+  setArticles,
+  buttonType = 'Like',
+  liked,
+  ...rest
+}: PropTypes) => {
+  const [toggleLike, setToggleLike] = useState(liked);
   const [active, setActive] = useState(false);
   const toggleActive = useCallback(() => setActive((active) => !active), []);
   const toggleLiked = useCallback(() => setToggleLike((toggleLike) => !toggleLike), []);
-  const likeIcon = toggleLike ? <FcLike /> : <FcLikePlaceholder />;
-  const content = toggleLike ? 'Saved To Favorites' : 'Removed From Favorites';
-  const toastMarkup = active ? <Toast content={content} onDismiss={toggleActive} duration={2500} /> : null;
+  const likeIcon = liked ? <FcLike /> : <FcLikePlaceholder />;
+  const content = liked ? 'Saved To Favorites' : 'Removed From Favorites';
+  const toastMarkup = active ? <Toast content={content} onDismiss={toggleActive} duration={1000} /> : null;
   const dataObjToAdd: UpdatedImgObj = { ...rest, id, title, srcURL } as UpdatedImgObj;
+
+  const updateLike = (bool?: boolean) => {
+    setArticles((prev: UpdatedImgObj[]) => {
+      const mapCopy = prev.map((obj) => {
+        if (obj.id === id) {
+          obj.liked = bool !== undefined ? bool : !liked;
+          return obj;
+        }
+        return obj;
+      });
+      return mapCopy;
+    });
+  };
 
   return (
     <Fragment>
       <ButtonGroup>
         <ShareModal srcURL={srcURL} title={title} />
         <Button
-          icon={buttonType ? likeIcon : <FiDelete fillOpacity={0} color="red" />}
+          icon={buttonType === 'Like' ? likeIcon : <FiDelete fillOpacity={0} color="red" />}
           onClick={() => {
             if (addEntry) {
               if (toggleLike === false) {
@@ -38,14 +62,16 @@ const CardButtons = ({ id, title, srcURL, addEntry, deleteEntry, buttonType = 'L
               } else if (toggleLike && deleteEntry) {
                 deleteEntry(id);
               }
+              updateLike();
               toggleLiked();
               toggleActive();
             }
-            // if (deleteEntry && imageObj) {
-            //   deleteEntry(imageObj.uuid);
-            //   toggleLiked();
-            //   toggleActive();
-            // }
+            if (deleteEntry && buttonType === 'Delete') {
+              deleteEntry(id);
+              updateLike(false);
+              toggleLiked();
+              toggleActive();
+            }
           }}
         />
       </ButtonGroup>
