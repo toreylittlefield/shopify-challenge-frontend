@@ -57,7 +57,13 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Frame>
-        <Page title="Spacestagram" primaryAction={primaryAction} subtitle="NASA" secondaryActions={secondaryActions}>
+        <Page
+          fullWidth
+          title="Spacestagram"
+          primaryAction={primaryAction}
+          subtitle="NASA"
+          secondaryActions={secondaryActions}
+        >
           <PageActions />
 
           <main className={styles.main}>
