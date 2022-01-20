@@ -13,7 +13,7 @@ export interface NasaSearchParams {
 
 export interface NasaApiObj {
   copyright: string;
-  date: Date;
+  date: string;
   explanation: string;
   hdurl: string;
   media_type: string;
@@ -25,10 +25,10 @@ export interface NasaApiObj {
 
 interface UpdatedImgObj extends Omit<NasaApiObj, 'date' | 'url'> {
   id: string;
-  earth_date: Date;
+  earth_date: Date | string;
   liked: boolean;
   imageBase64: string | undefined;
-  srcURL: string | URL;
+  srcURL: string;
   liked: boolean;
 }
 
