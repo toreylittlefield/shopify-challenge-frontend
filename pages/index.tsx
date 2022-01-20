@@ -10,7 +10,8 @@ import { updateApiDataNewProps } from '../utils';
 import { Article, LoadingContent, NASALogo, RocketLogo } from '../components';
 import { useFetch, useInfiniteScroll, useIndexedDB } from '../hooks';
 import { FcFeedIn, FcLike } from 'react-icons/fc';
-import { RiDeleteBin4Line } from 'react-icons/ri';
+import { RiDeleteBin4Line, RiGithubLine } from 'react-icons/ri';
+import { FaShopify } from 'react-icons/fa';
 
 export const getStaticProps = async () => {
   const { json = false, status, statusText } = await getImageDataAPI();
@@ -38,6 +39,33 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
 
   const DeleteAllIcon = <RiDeleteBin4Line fillOpacity={100} color="white" />;
 
+  const AnimatedLogo = (
+    <Fragment>
+      <h1 className={styles.title}>Spacestagram</h1>
+
+      <div className="logo-container">
+        <NASALogo className="stack" height={88} width={88} />
+        <div className="parent stack">
+          <RocketLogo height={16} width={32} />
+        </div>
+      </div>
+    </Fragment>
+  );
+
+  const RepoLink = (
+    <a href="https://github.com/toreylittlefield/shopify-challenge-frontend/" target="_blank" rel="noopener noreferrer">
+      <span className={styles.logo}>Link To The {<RiGithubLine />}</span>
+    </a>
+  );
+
+  const SubTitle = (
+    <Fragment>
+      <h2>
+        <FaShopify color="green" /> Shopify Internship Frontend Challenge 2022
+      </h2>
+    </Fragment>
+  );
+
   const primaryAction = {
     content: 'View Feed',
     icon: FcFeedIn,
@@ -61,13 +89,13 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
       <Frame>
         <Page
           fullWidth
-          title="Spacestagram"
+          title={RepoLink as any}
           primaryAction={primaryAction}
-          subtitle="NASA"
+          subtitle={SubTitle as any}
           secondaryActions={secondaryActions}
+          additionalNavigation={AnimatedLogo}
         >
           <main className={styles.main}>
-            <h1 className={styles.title}>Spacestagram</h1>
             <div className={styles.grid}>
               {viewFeed &&
                 articles.map((imgObj, index) => {
@@ -112,16 +140,18 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ data =
       </Frame>
 
       <footer ref={sentinelRef} className={styles.footer}>
-        <a href="https://www.github.com/toreylittlefield" target="_blank" rel="noopener noreferrer">
-          API by NASA
-          <span className={styles.logo}>
-            <div className="logo-container">
-              <NASALogo className="stack" height={88} width={88} />
-              <div className="parent stack">
-                <RocketLogo height={16} width={32} />
-              </div>
-            </div>
-          </span>
+        <div className="logo-container">
+          <NASALogo className="stack" height={88} width={88} />
+          <div className="parent stack">
+            <RocketLogo height={16} width={32} />
+          </div>
+        </div>
+        <a
+          href="https://github.com/toreylittlefield/shopify-challenge-frontend/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span className={styles.logo}>Link To The {<RiGithubLine />}</span>
         </a>
       </footer>
     </div>
